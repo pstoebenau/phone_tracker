@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   arkit_plugin: ^1.0.5
   udp: ^5.0.1
+  provider: ^6.0.2
 
 dev_dependencies:
   flutter_test:
