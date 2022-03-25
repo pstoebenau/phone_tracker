@@ -27,8 +27,7 @@ class MyApp extends StatelessWidget {
       appBar: AppBar(
         title: const Text('ARKit Demo'),
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
+      body: ListView(
         children: [
           SampleItem(item: samples[0]),
           SettingsForm(),
@@ -81,62 +80,44 @@ class SettingsForm extends StatefulWidget {
 }
 
 class SettingsFormState extends State<SettingsForm> {
-  int rotationAxis = 0;
+  String positionAxis = "xyz";
+  String rotationAxis = "xyz";
   double rotOffsetX = 0;
   double rotOffsetY = 0;
   double rotOffsetZ = 0;
+  double posMultX = 1;
+  double posMultY = 1;
+  double posMultZ = 1;
   double rotMultX = 1;
   double rotMultY = 1;
   double rotMultZ = 1;
 
   void saveFormToProvider() {
     Settings settings = context.read<Settings>();
+    settings.setPositionAxis(positionAxis);
     settings.setRotationAxis(rotationAxis);
     settings.setRotOffset(rotOffsetX, rotOffsetY, rotOffsetZ);
     settings.setRotMult(rotMultX, rotMultY, rotMultZ);
-  }
-  
-  Widget CustomRadioButton(String text, int index) {
-    return OutlinedButton(
-      onPressed: () {
-        setState(() {
-          rotationAxis = index;
-        });
-      },
-      child: Text(
-        text,
-        style: TextStyle(
-          color: (rotationAxis == index) ? Colors.green : Colors.black,
-        ),
-      ),
-      style: OutlinedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        side: BorderSide(color: (rotationAxis == index) ? Colors.green : Colors.black),
-      )
-    );
+    settings.setPosMult(posMultX, posMultY, posMultZ);
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Column(
-          children: [
-            Row(
-              children: [
-                CustomRadioButton("xyz", 0),
-                CustomRadioButton("xzy", 1),
-                CustomRadioButton("yxz", 2),
-              ],
-            ),
-            Row(
-              children: [
-                CustomRadioButton("yzx", 3),
-                CustomRadioButton("zxy", 4),
-                CustomRadioButton("zyx", 5),
-              ],
-            )
-          ],
+        TextField(
+          onChanged:(value) => positionAxis = value,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: "Position Axis",
+          ),
+        ),
+        TextField(
+          onChanged:(value) => rotationAxis = value,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: "Rotation Axis",
+          ),
         ),
         TextField(
           onChanged:(value) => rotOffsetX = double.parse(value),
@@ -159,23 +140,43 @@ class SettingsFormState extends State<SettingsForm> {
             hintText: "Rotation Offset Z",
           ),
         ),
+        const Text("Position Invert"),
+        ElevatedButton(
+          onPressed: () => setState(() {
+            posMultX *= -1;
+          }),
+          child: Text("X: ${posMultX}"),
+        ),
+        ElevatedButton(
+          onPressed: () => setState(() {
+            posMultY *= -1;
+          }),
+          child: Text("Y: ${posMultY}"),
+        ),
+        ElevatedButton(
+          onPressed: () => setState(() {
+            posMultZ *= -1;
+          }),
+          child: Text("Z: ${posMultZ}"),
+        ),
+        const Text("Rotation Invert"),
         ElevatedButton(
           onPressed: () => setState(() {
             rotMultX *= -1;
           }),
-          child: Text("Rotation Inert X: ${rotMultX}"),
+          child: Text("X: ${rotMultX}"),
         ),
         ElevatedButton(
           onPressed: () => setState(() {
             rotMultY *= -1;
           }),
-          child: Text("Rotation Inert Y: ${rotMultY}"),
+          child: Text("Y: ${rotMultY}"),
         ),
         ElevatedButton(
           onPressed: () => setState(() {
             rotMultZ *= -1;
           }),
-          child: Text("Rotation Inert Z: ${rotMultZ}"),
+          child: Text("Z: ${rotMultZ}"),
         ),
         const SizedBox(height: 50),
         SizedBox(
@@ -186,7 +187,9 @@ class SettingsFormState extends State<SettingsForm> {
             child: const Text("Save"),
           ),
         ),
-        Text("${context.watch<Settings>().rotationAxis}"),
+        Text(context.watch<Settings>().positionAxis),
+        Text("${context.watch<Settings>().posMult}"),
+        Text(context.watch<Settings>().rotationAxis),
         Text("${context.watch<Settings>().rotOffset}"),
         Text("${context.watch<Settings>().rotMult}"),
       ],

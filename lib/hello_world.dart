@@ -27,31 +27,48 @@ class _HelloWorldPagState extends State<HelloWorldPage> {
 
 	void updateTransform() async {
     Settings settings = context.read<Settings>();
-    RotationAxis rotationAxis = settings.rotationAxis;
+    String positionAxis = settings.positionAxis;
+    Vector3 posMult = Vector3.array(settings.posMult);
+    String rotationAxis = settings.rotationAxis;
     Vector3 rotOffset = Vector3.array(settings.rotOffset).scaled(math.pi/180);
     Vector3 rotMult = Vector3.array(settings.rotMult);
 
 		Matrix4? mat = await arkitController.pointOfViewTransform();
 		if (mat != null) {
 			position = mat.getTranslation().scaled(100);
-			position.multiply(Vector3(1, 1, -1));
-			quaternion = Quaternion.fromRotation(mat.getRotation());
+      if (positionAxis == "xzy") {
+        position = Vector3(position.x, position.z, position.y);
+      }
+      else if (positionAxis == "yxz") {
+        position = Vector3(position.y, position.x, position.z);
+      }
+      else if (positionAxis == "yzx") {
+        position = Vector3(position.y, position.z, position.x);
+      }
+      else if (positionAxis == "zxy") {
+        position = Vector3(position.z, position.x, position.y);
+      }
+      else if (positionAxis == "zyx") {
+        position = Vector3(position.z, position.y, position.x);
+      }
+      position.multiply(posMult);
 
+			quaternion = Quaternion.fromRotation(mat.getRotation());
 			Vector3 rot = QuaternionToEuler(quaternion);
       Vector3 UE4Rot = Vector3(rot.x, rot.y, rot.z);
-      if (rotationAxis == RotationAxis.xzy) {
+      if (rotationAxis == "xzy") {
         UE4Rot = Vector3(rot.x, rot.z, rot.y);
       }
-      else if (rotationAxis == RotationAxis.yxz) {
+      else if (rotationAxis == "yxz") {
         UE4Rot = Vector3(rot.y, rot.x, rot.z);
       }
-      else if (rotationAxis == RotationAxis.yzx) {
+      else if (rotationAxis == "yzx") {
         UE4Rot = Vector3(rot.y, rot.z, rot.x);
       }
-      else if (rotationAxis == RotationAxis.zxy) {
+      else if (rotationAxis == "zxy") {
         UE4Rot = Vector3(rot.z, rot.x, rot.y);
       }
-      else if (rotationAxis == RotationAxis.zyx) {
+      else if (rotationAxis == "zyx") {
         UE4Rot = Vector3(rot.z, rot.y, rot.x);
       }
       UE4Rot.add(rotOffset);

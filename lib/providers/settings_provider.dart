@@ -10,12 +10,24 @@ enum RotationAxis {
 }
 
 class Settings with ChangeNotifier {
-  RotationAxis rotationAxis = RotationAxis.xyz;
+  String positionAxis = "xyz";
+  String rotationAxis = "xyz";
   List<double> rotOffset = [0, 0, 0];
   List<double> rotMult = [1, 1, 1];
+  List<double> posMult = [1, 1, 1];
 
-  void setRotationAxis(int index) {
-    rotationAxis = RotationAxis.values[index];
+  void setPositionAxis(String value) {
+    positionAxis = value;
+    notifyListeners();
+  }
+
+  void setRotationAxis(String value) {
+    rotationAxis = value;
+    notifyListeners();
+  }
+
+  void setPosMult(double x, double y, double z) {
+    posMult = [x, y, z];
     notifyListeners();
   }
 
